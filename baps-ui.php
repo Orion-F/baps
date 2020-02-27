@@ -29,8 +29,6 @@ define("BAPS_UPLOAD_DIR", dirname(__FILE__) . "/uploads/");
 
 function baps_application_page() {
     forms();
-
-    send_mail("franz.papst@gmail.com", "vv93nn3423ad9gkrjd29");
 }
 
 // TODO: Warteliste verbessern
