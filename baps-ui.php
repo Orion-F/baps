@@ -29,6 +29,8 @@ define("BAPS_UPLOAD_DIR", dirname(__FILE__) . "/uploads/");
 
 function baps_application_page() {
     forms();
+
+    send_mail("franz.papst@gmail.com", "vv93nn3423ad9gkrjd29");
 }
 
 // TODO: Warteliste verbessern
@@ -41,7 +43,8 @@ function forms() {
     global $wpdb;
     $wp = $wpdb->prefix;
 
-    $app_slot_ids = array();    
+    $app_slot_ids = array();
+    $registered_message = "";
 
     if (!empty($_POST)) {
         $full_name = $_POST["full_name"];
@@ -93,6 +96,11 @@ function forms() {
             $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = {$rm} AND applicant_id = {$applicant_id}";
             $wpdb->query($query);
         }
+
+        $link = get_permalink()."?id=$uuid";
+        $registered_message = "<h2>Du hast dich erfolgreich für beWANTED angemeldet!</h2>
+        <p>Um Details deiner Anmeldung zu sehen, oder um nachträchlich etwas zu ändern klicke auf diesen Link:
+        <a href=$link'>$link</a></p><p>Bitte schreibe ihn auf oder speichere diese Seite als Lesezeichen.</p>";
     }
 
     if (isset($_GET["id"])) {
@@ -158,7 +166,6 @@ function forms() {
             float: left;
             margin-top: -19px;
             background: #FFFFFF;
-            height: 14px;
             padding: 2px 5px 2px 5px;
             color: #B9B9B9;
             font-size: 14px;
@@ -233,6 +240,7 @@ function forms() {
         </script>";
 
     $html = $style.$script;
+    $html = $html.$registered_message;
     $html = $html.sprintf('<form action="?id=%s" method="post" name="form" id="baps-form" enctype="multipart/form-data" onsubmit="return check()" class="form-style">', $uuid);
     $html = $html.'<ul>';
     $html = $html.'<li>';
@@ -432,11 +440,14 @@ function send_mail($recipient, $uuid) {
         <a href=$link'>$link</a></p>
         <p>Mit freundlichen Grüßen,<br/>BEST Vienna</p></body></html>";
 
-    mail(
+    $ret = mail(
         "vienna@best.eu.org",
         "Deine Anmeldung für beWANTED",
         $msg,
         implode("\r\n", $header)
     );
+
+    if (!$ret)
+        echo "Mail not sent";
 }
 ?>
