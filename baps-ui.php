@@ -98,7 +98,8 @@ function forms() {
         $link = get_permalink()."?id=$uuid";
         $registered_message = "<h2>Du hast dich erfolgreich für beWANTED angemeldet!</h2>
         <p>Um Details deiner Anmeldung zu sehen, oder um nachträchlich etwas zu ändern klicke auf diesen Link:
-        <a href=$link>$link</a></p><p>Bitte schreibe ihn auf oder speichere diese Seite als Lesezeichen.</p>";
+        <a href=$link>$link</a></p><p>Bitte schreibe ihn auf oder speichere diese Seite als Lesezeichen.</p>
+        <p>Wir haben dir ein Bestätigungsmail geschickt. Falls es bekommen hast, schau bitte in deinem Spam-Ordner nach.";
     }
 
     if (isset($_GET["id"])) {
