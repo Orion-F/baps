@@ -337,7 +337,7 @@ function forms() {
             //TODO: könnte man eleganter lösen
             $found = FALSE;
             foreach ($available_timeslots as $avl) {
-                if ($avl->timeslot_id == $timeslot) {
+                if ($avl->timeslot_id == $timeslot+1) {
                     $found = TRUE;
                 }
             }
