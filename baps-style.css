@@ -1,0 +1,85 @@
+/* TODO: use baps- prefixes */
+
+.form-style{
+    max-width:400px;
+    margin:50px auto;
+    background:#fff;
+    border-radius:2px;
+    padding:20px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.form-style ul{
+    padding:0;
+}
+.form-style li{
+    display: block;
+    padding: 9px;
+    border:1px solid #DDDDDD;
+    margin-bottom: 30px;
+    border-radius: 3px;
+}
+.form-style li:last-child{
+    border:none;
+    margin-bottom: 0px;
+    text-align: center;
+    height: 30px;
+}
+.form-style li > label{
+    display: block;
+    float: left;
+    margin-top: -19px;
+    background: #FFFFFF;
+    padding: 2px 5px 2px 5px;
+    color: #B9B9B9;
+    font-size: 14px;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.form-style input[type="text"],
+.form-style input[type="email"],
+.form-style select
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    display: block;
+    outline: none;
+    border: none;
+    height: 25px;
+    line-height: 25px;
+    font-size: 16px;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-style li > span{
+    background: #F3F3F3;
+    display: block;
+    padding: 3px;
+    margin: 0 -9px -9px -9px;
+    text-align: center;
+    color: #C0C0C0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+}
+.form-style input[type="submit"]{
+    background: #1d9188;
+    border: none;
+    padding: 10px 20px 10px 20px;
+    border-bottom: 3px solid #1d9188;
+    border-radius: 3px;
+    color: #FFFFFF;
+}
+.form-style input[type="submit"]:hover{
+    background: #dea514;
+    border-bottom: 3px solid #dea514;
+    color:#FFFFFF;
+}
+.box {
+    width: fit-content;
+    height: 30px;
+}
+#sel {
+    margin-top:15px;
+}
