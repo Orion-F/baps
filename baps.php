@@ -216,17 +216,17 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
     $companies = $wpdb->get_results($query);
     foreach ($companies as $c) {
         if ($c->name == 'Deloitte')
-            $query = "SELECT id FROM `wp_baps_timeslots` WHERE `slot` IN ('Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Mi. 17.6. 08:30', 'Mi. 17.6. 09:00', 'Mi. 17.6. 09:30')";
+            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Mi. 17.6. 08:30', 'Mi. 17.6. 09:00', 'Mi. 17.6. 09:30')";
         elseif ($c->name == 'PwC')
-            $query = "SELECT id FROM `wp_baps_timeslots` WHERE `slot` IN ('Mo. 15.6. 13:30', 'Mo. 15.6. 14:00', 'Mo. 15.6. 14:30', 'Di. 16.6. 13:30', 'Di. 16.6. 14:00', 'Di. 16.6. 14:30')";
+            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Mo. 15.6. 13:30', 'Mo. 15.6. 14:00', 'Mo. 15.6. 14:30', 'Di. 16.6. 13:30', 'Di. 16.6. 14:00', 'Di. 16.6. 14:30')";
         elseif ($c->name == 'Prodyna')
-            $query = "SELECT id FROM `wp_baps_timeslots` WHERE `slot` IN ('Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Di. 16.6. 10:00', 'Di. 16.6. 10:30', 'Di. 16.6. 11:00')";
+            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Di. 16.6. 10:00', 'Di. 16.6. 10:30', 'Di. 16.6. 11:00')";
         elseif ($c->name == 'Bosch')
-            $query = "SELECT id FROM `wp_baps_timeslots` WHERE `slot` IN ('Di. 16.6. 13:30', 'Di. 16.6. 14:00', 'Di. 16.6. 14:30', 'Di. 16.6. 15:00', 'Di. 16.6. 15:30', 'Di. 16.6. 16:00')";
+            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 13:30', 'Di. 16.6. 14:00', 'Di. 16.6. 14:30', 'Di. 16.6. 15:00', 'Di. 16.6. 15:30', 'Di. 16.6. 16:00')";
         elseif ($c->name == 'DXC')
-            $query = "SELECT id FROM `wp_baps_timeslots` WHERE `slot` IN ('Di. 16.6. 10:00', 'Di. 16.6. 10:30', 'Di. 16.6. 11:00', 'Di. 16.6. 11:30', 'Mi. 17.6. 13:30', 'Mi. 17.6. 14:00', 'Mi. 17.6. 14:30', 'Mi. 17.6. 15:00', 'Do. 18.6. 13:30', 'Do. 18.6. 14:00', 'Do. 18.6. 14:30', 'Do. 18.6. 15:00')"; 
+            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 10:00', 'Di. 16.6. 10:30', 'Di. 16.6. 11:00', 'Di. 16.6. 11:30', 'Mi. 17.6. 13:30', 'Mi. 17.6. 14:00', 'Mi. 17.6. 14:30', 'Mi. 17.6. 15:00', 'Do. 18.6. 13:30', 'Do. 18.6. 14:00', 'Do. 18.6. 14:30', 'Do. 18.6. 15:00')"; 
         elseif ($c->name == 'BRZ')
-            $query = "SELECT id FROM `wp_baps_timeslots` WHERE `slot` IN ('Mo. 15.6. 08:30', 'Mo. 15.6. 09:00', 'Mo. 15.6. 09:30', 'Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Mi. 17.6. 08:30', 'Mi. 17.6. 09:00', 'Mi. 17.6. 09:30', 'Do. 18.6. 08:30', 'Do. 18.6. 09:00', 'Do. 18.6. 09:30')";
+            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Mo. 15.6. 08:30', 'Mo. 15.6. 09:00', 'Mo. 15.6. 09:30', 'Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Mi. 17.6. 08:30', 'Mi. 17.6. 09:00', 'Mi. 17.6. 09:30', 'Do. 18.6. 08:30', 'Do. 18.6. 09:00', 'Do. 18.6. 09:30')";
         $slots = $wpdb->get_results($query);
         $query2 = "INSERT INTO {$wp}baps_timeslots_companies (id, company_id, timeslot_id) VALUES ";
         foreach ($slots as $s) {
