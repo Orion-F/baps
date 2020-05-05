@@ -16,6 +16,10 @@ add_action('init', 'baps_init');
 
 function baps_menu() {
     add_menu_page("BEST Application System", "BEST Application System", "publish_posts", "baps-admin", "baps_admin_page");
+    add_submenu_page("baps-admin", "Settings", "Settings", "activate_plugins", "baps_settings", "baps_settings_page");
+// add_submenu_page("applications", "Settings", "Settings", "activate_plugins", "applications_settings", "aps_settings_page");
+// add_submenu_page( string $parent_slug, string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', int $position = null )
+// add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
 }
 
 function baps_init() {
@@ -138,11 +142,11 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
     $wpdb->query($query);
 
 // TODO: diese 3 INSERTs nicht hardcoden sondern sachen im Backend dafür schreiben
-    $query = "INSERT INTO {$wp}baps_companies (id, name) VALUES 
+    $query = "INSERT IGNORE INTO {$wp}baps_companies (id, name) VALUES 
       (NULL, 'Prodyna'), (NULL, 'PwC'), (NULL, 'DXC'), (NULL, 'BRZ'), (NULL, 'Bosch'), (NULL, 'Deloitte')";
     $wpdb->query($query);
 
-    $query = "INSERT INTO {$wp}baps_timeslots (`id`, `slot`, `window`) VALUES
+    $query = "INSERT IGNORE INTO {$wp}baps_timeslots (`id`, `slot`, `window`) VALUES
       (NULL, 'Mo. 15.6. 08:30', 'morning'),
       (NULL, 'Mo. 15.6. 09:00', 'morning'),
       (NULL, 'Mo. 15.6. 09:30', 'morning'),
