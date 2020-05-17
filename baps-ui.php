@@ -40,9 +40,10 @@ function baps_application_page() {
     forms();
 }
 
+// TODO: Fehlermeldung falls id nicht gefunden
+// TODO: PDF holen und zeigen
 // TODO: Warteliste verbessern
 // TODO: persönliches Email
-// TODO: Backend für Timeslots von Firmen
 // TODO: Matrikelnummer eindeutig machen
 // TODO: add MySQL sanitizer
 
@@ -57,11 +58,16 @@ function forms() {
 
     $query_timeslots = "SELECT id, slot FROM {$wp}baps_timeslots";
     $response_timeslots = $wpdb->get_results($query_timeslots);
-    $timeslots = array_combine(array_column($response_timeslots, 'id'), array_column($response_timeslots, 'slot'));
+    $timeslots = array_combine(array_column($response_timeslots, "id"), array_column($response_timeslots, 'slot'));
 
     $query_companies = "SELECT id, name FROM {$wp}baps_companies";
     $response_companies = $wpdb->get_results($query_companies);
-    $companies = array_combine(array_column($response_companies, 'id'), array_column($response_companies, 'name'));
+    $companies = array_combine(array_column($response_companies, "id"), array_column($response_companies, "name"));
+
+    $query_study_fields = "SELECT id, name FROM {$wp}baps_study_fields";
+    $response_study_fields = $wpdb->get_results($query_study_fields);
+    $study_fields = array_combine(array_column($response_study_fields, "id"), array_column($response_study_fields, "name"));
+    $study_fields_flipped = array_flip($study_fields);
 
     // add / update application
     // TODO: move to function
@@ -87,11 +93,16 @@ function forms() {
         upload_file($uuid);
         send_mail($email, $uuid);
 
-        $query = "REPLACE INTO {$wp}baps_applicants (id, name, email, student_id, uuid, study_field, semester) 
-            VALUES ($app_id, '$full_name', '$email', '$student_id', '$uuid', '$study_field', '$semester')";
+        // probably not the most elegant way, to deactivate the foreign key checks
+        $query = "SET foreign_key_checks = 0";
         $wpdb->query($query);
+        $query = "REPLACE INTO {$wp}baps_applicants (id, name, email, student_id, uuid, study_field, semester) 
+            VALUES ($app_id, '$full_name', '$email', '$student_id', '$uuid', '$study_fields_flipped[$study_field]', '$semester')";
+        $wpdb->query($query);
+        $query = "SET foreign_key_checks = 1";
+        $wpdb->query($query); 
 
-        $query = "SELECT id FROM {$wp}baps_applicants WHERE uuid = '{$uuid}'";
+        $query = "SELECT id FROM {$wp}baps_applicants WHERE uuid = '$uuid'";
         $applicant_id = $wpdb->get_var($query);
 
         $query = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id = '$applicant_id'";
@@ -108,11 +119,13 @@ function forms() {
             $split = explode(".", $add);
             $company_id = array_flip($companies)[$split[0]];
             $query = "INSERT INTO {$wp}baps_timeslots_applicants (id, applicant_id, company_id, timeslot_id, timestamp)
-                VALUES (NULL, '{$applicant_id}', '{$company_id}','{$split[1]}', CURRENT_TIMESTAMP)";
+                VALUES (NULL, '$applicant_id', '$company_id','$split[1]', CURRENT_TIMESTAMP)";
             $wpdb->query($query);
         }
         foreach ($removed as $rm) {
-            $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = {$rm} AND company_id = {$company_id} AND applicant_id = {$applicant_id}";
+            $split = explode(".", $rm);
+            $company_id = array_flip($companies)[$split[0]];
+            $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = $split[1] AND company_id = $company_id AND applicant_id = $applicant_id";
             $wpdb->query($query);
         }
 
@@ -133,7 +146,7 @@ function forms() {
         $full_name = $filled->name;
         $email = $filled->email;
         $student_id = $filled->student_id;
-        $study_field = $filled->study_field;
+        $study_field = $study_fields[$filled->study_field];
         $semester = $filled->semester;
         $app_id = $filled->id;
 

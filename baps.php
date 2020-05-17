@@ -62,20 +62,7 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
 (NULL, '09:00'), (NULL, '09:30'), (NULL, '10:00'), (NULL, '10:30'), (NULL, '11:00'), (NULL, '11:30'), (NULL, '12:00'), (NULL, '13:30'),
 (NULL, '14:00'), (NULL, '14:30'), (NULL, '15:00'), (NULL, '15:30'), (NULL, '16:00'), (NULL, '16:30')
   */
-
-  $query = "CREATE TABLE IF NOT EXISTS`{$wp}baps_applicants` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `name` varchar(255),
-      `email` varchar(255),
-      `student_id` varchar(255),
-      `uuid` varchar(50),
-      `study_field` varchar(255),
-      `semester` varchar(10),
-      PRIMARY KEY (`id`),
-      UNIQUE (id, uuid)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
-    $wpdb->query($query);
-
+  
   $query = "CREATE TABLE IF NOT EXISTS`{$wp}baps_companies` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `name` varchar(255),
@@ -84,14 +71,43 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
   $wpdb->query($query);
 
-  // TODO: window entfernen (?)
   $query = "CREATE TABLE IF NOT EXISTS`{$wp}baps_timeslots` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `slot` varchar(30),
-      `window` varchar(11),
       PRIMARY KEY (`id`),
       UNIQUE (id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
+  $wpdb->query($query);
+
+  $query = "CREATE TABLE `{$wp}baps_timeslots_companies` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `company_id` int(11),
+    `timeslot_id` int(11),
+    UNIQUE (id),
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
+  $wpdb->query($query);
+
+  $query = "CREATE TABLE IF NOT EXISTS `{$wp}baps_study_fields` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255),
+    UNIQUE (id),
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
+  $wpdb->query($query);
+
+  $query = "CREATE TABLE IF NOT EXISTS`{$wp}baps_applicants` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255),
+    `email` varchar(255),
+    `student_id` varchar(255),
+    `uuid` varchar(50),
+    `study_field` int(11),
+    `semester` varchar(10),
+    PRIMARY KEY (`id`),
+    UNIQUE (id, uuid),
+    CONSTRAINT fk_study_field FOREIGN KEY (study_field) REFERENCES {$wp}baps_study_fields(id) ON UPDATE CASCADE ON DELETE RESTRICT
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
   $wpdb->query($query);
 
   $query = "CREATE TABLE IF NOT EXISTS `{$wp}baps_timeslots_applicants` (
@@ -101,25 +117,12 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
       `timeslot_id` int(11),
       `timestamp` timestamp,
       UNIQUE (id),
-      PRIMARY KEY (`id`)
+      PRIMARY KEY (`id`),
+      CONSTRAINT fk_applicant_id FOREIGN KEY (applicant_id) REFERENCES {$wp}baps_applicants(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+      CONSTRAINT fk_company_id FOREIGN KEY (company_id) REFERENCES {$wp}baps_companies(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+      CONSTRAINT fk_timeslot FOREIGN KEY (timeslot_id) REFERENCES {$wp}baps_timeslots(id) ON UPDATE CASCADE ON DELETE RESTRICT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
-    $wpdb->query($query);
-
-    $query = "CREATE TABLE `{$wp}baps_timeslots_companies` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `company_id` int(11),
-      `timeslot_id` int(11),
-      UNIQUE (id),
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
-    $wpdb->query($query);
-
-    $query = "CREATE TABLE IF NOT EXISTS `{$wp}baps_study_fields` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `name` varchar(255),
-      UNIQUE (id),
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
+    echo($query);
     $wpdb->query($query);
 
     $query = "INSERT INTO {$wp}baps_study_fields (id, name) VALUES 
@@ -146,68 +149,68 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
       (NULL, 'Prodyna'), (NULL, 'PwC'), (NULL, 'DXC'), (NULL, 'BRZ'), (NULL, 'Deloitte')";
     $wpdb->query($query);
 
-    $query = "INSERT IGNORE INTO {$wp}baps_timeslots (`id`, `slot`, `window`) VALUES
-      (NULL, 'Mo. 15.6. 08:30', 'morning'),
-      (NULL, 'Mo. 15.6. 09:00', 'morning'),
-      (NULL, 'Mo. 15.6. 09:30', 'morning'),
-      (NULL, 'Mo. 15.6. 10:00', 'morning'),
-      (NULL, 'Mo. 15.6. 10:30', 'morning'),
-      (NULL, 'Mo. 15.6. 11:00', 'morning'),
-      (NULL, 'Mo. 15.6. 13:30', 'afternoon'),
-      (NULL, 'Mo. 15.6. 14:00', 'afternoon'),
-      (NULL, 'Mo. 15.6. 14:30', 'afternoon'),
-      (NULL, 'Mo. 15.6. 15:00', 'afternoon'),
-      (NULL, 'Mo. 15.6. 15:30', 'afternoon'),
-      (NULL, 'Mo. 15.6. 16:00', 'afternoon'),
-      (NULL, 'Di. 16.6. 08:30', 'morning'),
-      (NULL, 'Di. 16.6. 09:00', 'morning'),
-      (NULL, 'Di. 16.6. 09:30', 'morning'),
-      (NULL, 'Di. 16.6. 10:00', 'morning'),
-      (NULL, 'Di. 16.6. 10:30', 'morning'),
-      (NULL, 'Di. 16.6. 11:00', 'morning'),
-      (NULL, 'Di. 16.6. 11:30', 'morning'),
-      (NULL, 'Di. 16.6. 13:30', 'afternoon'),
-      (NULL, 'Di. 16.6. 14:00', 'afternoon'),
-      (NULL, 'Di. 16.6. 14:30', 'afternoon'),
-      (NULL, 'Di. 16.6. 15:00', 'afternoon'),
-      (NULL, 'Di. 16.6. 15:30', 'afternoon'),
-      (NULL, 'Di. 16.6. 16:00', 'afternoon'),
-      (NULL, 'Mi. 17.6. 08:30', 'morning'),
-      (NULL, 'Mi. 17.6. 09:00', 'morning'),
-      (NULL, 'Mi. 17.6. 09:30', 'morning'),
-      (NULL, 'Mi. 17.6. 10:00', 'morning'),
-      (NULL, 'Mi. 17.6. 10:30', 'morning'),
-      (NULL, 'Mi. 17.6. 11:00', 'morning'),
-      (NULL, 'Mi. 17.6. 13:30', 'afternoon'),
-      (NULL, 'Mi. 17.6. 14:00', 'afternoon'),
-      (NULL, 'Mi. 17.6. 14:30', 'afternoon'),
-      (NULL, 'Mi. 17.6. 15:00', 'afternoon'),
-      (NULL, 'Mi. 17.6. 15:30', 'afternoon'),
-      (NULL, 'Mi. 17.6. 16:00', 'afternoon'),
-      (NULL, 'Do. 18.6. 08:30', 'morning'),
-      (NULL, 'Do. 18.6. 09:00', 'morning'),
-      (NULL, 'Do. 18.6. 09:30', 'morning'),
-      (NULL, 'Do. 18.6. 10:00', 'morning'),
-      (NULL, 'Do. 18.6. 10:30', 'morning'),
-      (NULL, 'Do. 18.6. 11:00', 'morning'),
-      (NULL, 'Do. 18.6. 13:30', 'afternoon'),
-      (NULL, 'Do. 18.6. 14:00', 'afternoon'),
-      (NULL, 'Do. 18.6. 14:30', 'afternoon'),
-      (NULL, 'Do. 18.6. 15:00', 'afternoon'),
-      (NULL, 'Do. 18.6. 15:30', 'afternoon'),
-      (NULL, 'Do. 18.6. 16:00', 'afternoon'),
-      (NULL, 'Fr. 19.6. 08:30', 'morning'),
-      (NULL, 'Fr. 19.6. 09:00', 'morning'),
-      (NULL, 'Fr. 19.6. 09:30', 'morning'),
-      (NULL, 'Fr. 19.6. 10:00', 'morning'),
-      (NULL, 'Fr. 19.6. 10:30', 'morning'),
-      (NULL, 'Fr. 19.6. 11:00', 'morning'),
-      (NULL, 'Fr. 19.6. 13:30', 'afternoon'),
-      (NULL, 'Fr. 19.6. 14:00', 'afternoon'),
-      (NULL, 'Fr. 19.6. 14:30', 'afternoon'),
-      (NULL, 'Fr. 19.6. 15:00', 'afternoon'),
-      (NULL, 'Fr. 19.6. 15:30', 'afternoon'),
-      (NULL, 'Fr. 19.6. 16:00', 'afternoon')";
+    $query = "INSERT IGNORE INTO {$wp}baps_timeslots (`id`, `slot`) VALUES
+      (NULL, 'Mo. 15.6. 08:30'),
+      (NULL, 'Mo. 15.6. 09:00'),
+      (NULL, 'Mo. 15.6. 09:30'),
+      (NULL, 'Mo. 15.6. 10:00'),
+      (NULL, 'Mo. 15.6. 10:30'),
+      (NULL, 'Mo. 15.6. 11:00'),
+      (NULL, 'Mo. 15.6. 13:30'),
+      (NULL, 'Mo. 15.6. 14:00'),
+      (NULL, 'Mo. 15.6. 14:30'),
+      (NULL, 'Mo. 15.6. 15:00'),
+      (NULL, 'Mo. 15.6. 15:30'),
+      (NULL, 'Mo. 15.6. 16:00'),
+      (NULL, 'Di. 16.6. 08:30'),
+      (NULL, 'Di. 16.6. 09:00'),
+      (NULL, 'Di. 16.6. 09:30'),
+      (NULL, 'Di. 16.6. 10:00'),
+      (NULL, 'Di. 16.6. 10:30'),
+      (NULL, 'Di. 16.6. 11:00'),
+      (NULL, 'Di. 16.6. 11:30'),
+      (NULL, 'Di. 16.6. 13:30'),
+      (NULL, 'Di. 16.6. 14:00'),
+      (NULL, 'Di. 16.6. 14:30'),
+      (NULL, 'Di. 16.6. 15:00'),
+      (NULL, 'Di. 16.6. 15:30'),
+      (NULL, 'Di. 16.6. 16:00'),
+      (NULL, 'Mi. 17.6. 08:30'),
+      (NULL, 'Mi. 17.6. 09:00'),
+      (NULL, 'Mi. 17.6. 09:30'),
+      (NULL, 'Mi. 17.6. 10:00'),
+      (NULL, 'Mi. 17.6. 10:30'),
+      (NULL, 'Mi. 17.6. 11:00'),
+      (NULL, 'Mi. 17.6. 13:30'),
+      (NULL, 'Mi. 17.6. 14:00'),
+      (NULL, 'Mi. 17.6. 14:30'),
+      (NULL, 'Mi. 17.6. 15:00'),
+      (NULL, 'Mi. 17.6. 15:30'),
+      (NULL, 'Mi. 17.6. 16:00'),
+      (NULL, 'Do. 18.6. 08:30'),
+      (NULL, 'Do. 18.6. 09:00'),
+      (NULL, 'Do. 18.6. 09:30'),
+      (NULL, 'Do. 18.6. 10:00'),
+      (NULL, 'Do. 18.6. 10:30'),
+      (NULL, 'Do. 18.6. 11:00'),
+      (NULL, 'Do. 18.6. 13:30'),
+      (NULL, 'Do. 18.6. 14:00'),
+      (NULL, 'Do. 18.6. 14:30'),
+      (NULL, 'Do. 18.6. 15:00'),
+      (NULL, 'Do. 18.6. 15:30'),
+      (NULL, 'Do. 18.6. 16:00'),
+      (NULL, 'Fr. 19.6. 08:30'),
+      (NULL, 'Fr. 19.6. 09:00'),
+      (NULL, 'Fr. 19.6. 09:30'),
+      (NULL, 'Fr. 19.6. 10:00'),
+      (NULL, 'Fr. 19.6. 10:30'),
+      (NULL, 'Fr. 19.6. 11:00'),
+      (NULL, 'Fr. 19.6. 13:30'),
+      (NULL, 'Fr. 19.6. 14:00'),
+      (NULL, 'Fr. 19.6. 14:30'),
+      (NULL, 'Fr. 19.6. 15:00'),
+      (NULL, 'Fr. 19.6. 15:30'),
+      (NULL, 'Fr. 19.6. 16:00')";
     $wpdb->query($query);
 
 
