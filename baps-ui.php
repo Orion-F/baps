@@ -40,7 +40,6 @@ function baps_application_page() {
     forms();
 }
 
-// TODO: Fehlermeldung falls id nicht gefunden
 // TODO: PDF holen und zeigen
 // TODO: Warteliste verbessern
 // TODO: persönliches Email
@@ -140,22 +139,35 @@ function forms() {
     if (isset($_GET["id"])) {
         $uuid = $_GET["id"];
 
-        $query = "SELECT * FROM {$wp}baps_applicants WHERE uuid = '{$uuid}'";
-        $filled = $wpdb->get_results($query)[0];
+        if (!$wpdb->get_var("SELECT id FROM {$wp}baps_applicants WHERE uuid = '$uuid'")) {
+            echo("Bewerbung nicht gefunden, bitte überprüfe deinen Link oder kontaktiere die Organisatoren des Events.");
 
-        $full_name = $filled->name;
-        $email = $filled->email;
-        $student_id = $filled->student_id;
-        $study_field = $study_fields[$filled->study_field];
-        $semester = $filled->semester;
-        $app_id = $filled->id;
+            $uuid = substr(md5(rand(1000, 100000)."+".rand(0, 100000)."+".rand(0, 1000000)), 0, 32);
 
-        if (!$app_slot_ids) {
-            $query = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id={$app_id}";
-            $response = $wpdb->get_results($query);
-            
-            foreach ($response as $r)
-                array_push($app_slot_ids, $companies[$r->company_id].".".$r->timeslot_id);
+            $full_name = "";
+            $email = "";
+            $student_id = "";
+            $study_field = "";
+            $semester = "";
+        }
+        else {
+            $query = "SELECT * FROM {$wp}baps_applicants WHERE uuid = '$uuid'";
+            $filled = $wpdb->get_results($query)[0];
+
+            $full_name = $filled->name;
+            $email = $filled->email;
+            $student_id = $filled->student_id;
+            $study_field = $study_fields[$filled->study_field];
+            $semester = $filled->semester;
+            $app_id = $filled->id;
+
+            if (!$app_slot_ids) {
+                $query = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id={$app_id}";
+                $response = $wpdb->get_results($query);
+                
+                foreach ($response as $r)
+                    array_push($app_slot_ids, $companies[$r->company_id].".".$r->timeslot_id);
+            }
         }
     }
     // create new page
