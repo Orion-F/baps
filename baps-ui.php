@@ -41,11 +41,9 @@ function baps_application_page() {
     forms();
 }
 
+// TODO: Matrikelnummer eindeutig machen
 // TODO: Warteliste verbessern
 // TODO: persönliches Email
-// TODO: Matrikelnummer eindeutig machen
-// TODO: add MySQL sanitizer
-// TODO: MAX global machen
 
 function forms() {
     global $wpdb;
@@ -96,8 +94,8 @@ function forms() {
         $query = "SET foreign_key_checks = 0";
         $wpdb->query($query);
         $query = "REPLACE INTO {$wp}baps_applicants (id, name, email, student_id, uuid, study_field, semester) 
-            VALUES ($app_id, '$full_name', '$email', '$student_id', '$uuid', '$study_fields_flipped[$study_field]', '$semester')";
-        $wpdb->query($query);
+            VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s')";
+        $wpdb->query($wpdb->prepare($query, $app_id, $full_name, $email, $student_id, $uuid, $study_fields_flipped[$study_field], $semester));
         $query = "SET foreign_key_checks = 1";
         $wpdb->query($query); 
 
@@ -118,14 +116,14 @@ function forms() {
             $split = explode(".", $add);
             $company_id = array_flip($companies)[$split[0]];
             $query = "INSERT INTO {$wp}baps_timeslots_applicants (id, applicant_id, company_id, timeslot_id, timestamp)
-                VALUES (NULL, '$applicant_id', '$company_id','$split[1]', CURRENT_TIMESTAMP)";
-            $wpdb->query($query);
+                VALUES (NULL, '%s', '%s','%s', CURRENT_TIMESTAMP)";
+            $wpdb->query($wpdb->prepare($query, $applicant_id, $company_id, $split[1]));
         }
         foreach ($removed as $rm) {
             $split = explode(".", $rm);
             $company_id = array_flip($companies)[$split[0]];
-            $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = $split[1] AND company_id = $company_id AND applicant_id = $applicant_id";
-            $wpdb->query($query);
+            $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = %s AND company_id = %s AND applicant_id = %s";
+            $wpdb->query($wpdb->prepare($query, $split[1], $company_id, $applicant_id));
         }
 
         $link = get_permalink()."?id=$uuid";
@@ -435,4 +433,5 @@ function send_mail($recipient, $uuid) {
         implode("\r\n", $header)
     );
 }
+
 ?>
