@@ -63,7 +63,7 @@ function forms() {
     $response_companies = $wpdb->get_results($query_companies);
     $companies = array_combine(array_column($response_companies, 'id'), array_column($response_companies, 'name'));
 
-    // add new application
+    // add / update application
     // TODO: move to function
     if (!empty($_POST)) {
         $full_name = $_POST["full_name"];
@@ -246,8 +246,8 @@ function forms() {
                 $selectors = $selectors."<select name=\"{$select_name}\"><option></option>";
             }
             else {
-                $selectors = $selectors."</select name=\"{$select_name}\">{$companies[$r_t->company_id]}";
-                $selectors = $selectors."<select><option></option>";
+                $selectors = $selectors."</select>{$companies[$r_t->company_id]}";
+                $selectors = $selectors."<select name=\"{$select_name}\"><option></option>";
             }
             
             $old_company = $r_t->company_id;
