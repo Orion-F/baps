@@ -35,6 +35,7 @@ add_action( "wp_enqueue_scripts", "register_baps_resources");
 add_shortcode("baps", "baps_application_page");
 
 define("BAPS_UPLOAD_DIR", dirname(__FILE__) . "/uploads/");
+define("MAX_TIMESLOTS", 2);
 
 function baps_application_page() {
     forms();
@@ -53,8 +54,6 @@ function forms() {
     $app_slot_ids = array();
     $registered_message = "";
     $file_uploaded = 0;
-
-    $MAX_TIMESLOTS = 2;
 
     $query_timeslots = "SELECT id, slot FROM {$wp}baps_timeslots";
     $response_timeslots = $wpdb->get_results($query_timeslots);
@@ -288,7 +287,7 @@ function forms() {
                 $num_applications_timeslot++;
             }
         }
-        $free_slots = $MAX_TIMESLOTS - $num_applications_timeslot;
+        $free_slots = MAX_TIMESLOTS - $num_applications_timeslot;
         $app_id = $companies[$r_t->company_id].".".$r_t->timeslot_id;
         if (in_array($app_id, $app_slot_ids))
             $selected = 'selected';
