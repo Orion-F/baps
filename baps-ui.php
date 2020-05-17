@@ -53,6 +53,16 @@ function forms() {
     $app_slot_ids = array();
     $registered_message = "";
 
+    $MAX_TIMESLOTS = 2;
+
+    $query_timeslots = "SELECT id, slot FROM {$wp}baps_timeslots";
+    $response_timeslots = $wpdb->get_results($query_timeslots);
+    $timeslots = array_combine(array_column($response_timeslots, 'id'), array_column($response_timeslots, 'slot'));
+
+    $query_companies = "SELECT id, name FROM {$wp}baps_companies";
+    $response_companies = $wpdb->get_results($query_companies);
+    $companies = array_combine(array_column($response_companies, 'id'), array_column($response_companies, 'name'));
+
     // add new application
     // TODO: move to function
     if (!empty($_POST)) {
@@ -84,25 +94,25 @@ function forms() {
         $query = "SELECT id FROM {$wp}baps_applicants WHERE uuid = '{$uuid}'";
         $applicant_id = $wpdb->get_var($query);
 
-// TODO: add company_id (?)
-
-        $query = "SELECT timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id = '$applicant_id'";
+        $query = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id = '$applicant_id'";
         $old_occupied = $wpdb->get_results($query);
         $tmp = array();
         foreach($old_occupied as $old) {
-            array_push($tmp, $old->timeslot_id);
+            array_push($tmp, $companies[$old->company_id].".".$old->timeslot_id);
         }
         $old_occupied = $tmp;
         $removed = array_diff($old_occupied, $app_slot_ids);
         $added = array_diff($app_slot_ids, $old_occupied);
 
-        foreach ($added as $slot_id) {
-            $query = "INSERT INTO {$wp}baps_timeslots_applicants (id, applicant_id, timeslot_id, timestamp)
-                VALUES (NULL, '{$applicant_id}','{$slot_id}', CURRENT_TIMESTAMP)";
+        foreach ($added as $add) {
+            $split = explode(".", $add);
+            $company_id = array_flip($companies)[$split[0]];
+            $query = "INSERT INTO {$wp}baps_timeslots_applicants (id, applicant_id, company_id, timeslot_id, timestamp)
+                VALUES (NULL, '{$applicant_id}', '{$company_id}','{$split[1]}', CURRENT_TIMESTAMP)";
             $wpdb->query($query);
         }
         foreach ($removed as $rm) {
-            $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = {$rm} AND applicant_id = {$applicant_id}";
+            $query = "DELETE FROM {$wp}baps_timeslots_applicants WHERE timeslot_id = {$rm} AND company_id = {$company_id} AND applicant_id = {$applicant_id}";
             $wpdb->query($query);
         }
 
@@ -128,11 +138,11 @@ function forms() {
         $app_id = $filled->id;
 
         if (!$app_slot_ids) {
-            $query = "SELECT timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id={$app_id}";
+            $query = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id={$app_id}";
             $response = $wpdb->get_results($query);
             
             foreach ($response as $r)
-                array_push($app_slot_ids, $r->timeslot_id);
+                array_push($app_slot_ids, $companies[$r->company_id].".".$r->timeslot_id);
         }
     }
     // create new page
@@ -199,11 +209,12 @@ function forms() {
     $html = $html.'<li>';
     //echo $html;
 
+    /*
     $query = "SELECT COUNT(*) FROM {$wp}baps_companies";
     $num_companies = $wpdb->get_var($query);
     $query = "SELECT COUNT(*) FROM {$wp}baps_timeslots";
     $num_timeslots = $wpdb->get_var($query);
-    
+
     $timetable = array();
     for ($i=0; $i<$num_timeslots; $i++) {
         for ($j=0; $j<$num_companies; $j++) {
@@ -211,13 +222,55 @@ function forms() {
             $timetable[$i][$j] = $arr;
         }
     }
+    */
 
     //$query = "SELECT {$wp}baps_timeslots_applicants.applicant_id, {$wp}baps_timeslots_applicants.company_id, {$wp}baps_timeslots_applicants.timeslot_id FROM wp_baps_applicants INNER JOIN wp_baps_timeslots_applicants ON wp_baps_timeslots_applicants.applicant_id=wp_baps_applicants.id ORDER BY {$wp}baps_timeslots_applicants.timestamp ASC";
-    $query = "SELECT {$wp}baps_timeslots_applicants.applicant_id, {$wp}baps_timeslots_applicants.timeslot_id FROM {$wp}baps_applicants 
+    /*$query = "SELECT {$wp}baps_timeslots_applicants.applicant_id, {$wp}baps_timeslots_applicants.timeslot_id FROM {$wp}baps_applicants 
         INNER JOIN {$wp}baps_timeslots_applicants ON {$wp}baps_timeslots_applicants.applicant_id={$wp}baps_applicants.id 
         ORDER BY {$wp}baps_timeslots_applicants.timestamp ASC";
-    $response = $wpdb->get_results($query);
-   
+    $response = $wpdb->get_results($query);*/
+
+    $query_occupations = "SELECT applicant_id, company_id, timeslot_id FROM {$wp}baps_timeslots_applicants";
+    $response_occupations = $wpdb->get_results($query_occupations);
+
+    $query_company_timeslots = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_companies";
+    $response_company_timeslots = $wpdb->get_results($query_company_timeslots);
+
+    $selectors = '';
+    $old_company = 0;
+    foreach ($response_company_timeslots as $r_t) {
+        if ($old_company != $r_t->company_id) {
+            $select_name = "com_".$companies[$r_t->company_id];
+            if ($selectors == '') {
+                $selectors = $selectors."<div style=\"display:block;\">{$companies[$r_t->company_id]}";
+                $selectors = $selectors."<select name=\"{$select_name}\"><option></option>";
+            }
+            else {
+                $selectors = $selectors."</select name=\"{$select_name}\">{$companies[$r_t->company_id]}";
+                $selectors = $selectors."<select><option></option>";
+            }
+            
+            $old_company = $r_t->company_id;
+        }
+        $num_applications_timeslot = 0;
+
+        foreach ($response_occupations as $r_o) {
+            if ($r_o->company_id == $r_t->company_id && $r_o->timeslot_id == $r_t->timeslot_id) {
+                $num_applications_timeslot++;
+            }
+        }
+        $free_slots = $MAX_TIMESLOTS - $num_applications_timeslot;
+        $app_id = $companies[$r_t->company_id].".".$r_t->timeslot_id;
+        if (in_array($app_id, $app_slot_ids))
+            $selected = 'selected';
+        else
+            $selected = '';
+
+        $selectors = $selectors."<option value=\"{$app_id}\" {$selected}>{$timeslots[$r_t->timeslot_id]} ({$free_slots})</option>";
+    }
+    $selectors = $selectors."</select>";
+
+    /*
     $ts_query = "SELECT id, slot from {$wp}baps_timeslots";
     $ts_response = $wpdb->get_results($ts_query);
 
@@ -267,6 +320,7 @@ function forms() {
         }
         $selectors = $selectors."</select>";
     }
+    */
     $selectors = $selectors."</div>";
  
     $html = $html.$selectors."</li>";

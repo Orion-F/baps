@@ -143,7 +143,7 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
 
 // TODO: diese 3 INSERTs nicht hardcoden sondern sachen im Backend dafür schreiben
     $query = "INSERT IGNORE INTO {$wp}baps_companies (id, name) VALUES 
-      (NULL, 'Prodyna'), (NULL, 'PwC'), (NULL, 'DXC'), (NULL, 'BRZ'), (NULL, 'Bosch'), (NULL, 'Deloitte')";
+      (NULL, 'Prodyna'), (NULL, 'PwC'), (NULL, 'DXC'), (NULL, 'BRZ'), (NULL, 'Deloitte')";
     $wpdb->query($query);
 
     $query = "INSERT IGNORE INTO {$wp}baps_timeslots (`id`, `slot`, `window`) VALUES
@@ -221,8 +221,6 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
             $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Mo. 15.6. 13:30', 'Mo. 15.6. 14:00', 'Mo. 15.6. 14:30', 'Di. 16.6. 13:30', 'Di. 16.6. 14:00', 'Di. 16.6. 14:30')";
         elseif ($c->name == 'Prodyna')
             $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 08:30', 'Di. 16.6. 09:00', 'Di. 16.6. 09:30', 'Di. 16.6. 10:00', 'Di. 16.6. 10:30', 'Di. 16.6. 11:00')";
-        elseif ($c->name == 'Bosch')
-            $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 13:30', 'Di. 16.6. 14:00', 'Di. 16.6. 14:30', 'Di. 16.6. 15:00', 'Di. 16.6. 15:30', 'Di. 16.6. 16:00')";
         elseif ($c->name == 'DXC')
             $query = "SELECT id FROM {$wp}baps_timeslots WHERE `slot` IN ('Di. 16.6. 10:00', 'Di. 16.6. 10:30', 'Di. 16.6. 11:00', 'Di. 16.6. 11:30', 'Mi. 17.6. 13:30', 'Mi. 17.6. 14:00', 'Mi. 17.6. 14:30', 'Mi. 17.6. 15:00', 'Do. 18.6. 13:30', 'Do. 18.6. 14:00', 'Do. 18.6. 14:30', 'Do. 18.6. 15:00')"; 
         elseif ($c->name == 'BRZ')
