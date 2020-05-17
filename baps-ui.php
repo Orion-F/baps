@@ -40,11 +40,11 @@ function baps_application_page() {
     forms();
 }
 
-// TODO: PDF holen und zeigen
 // TODO: Warteliste verbessern
 // TODO: persönliches Email
 // TODO: Matrikelnummer eindeutig machen
 // TODO: add MySQL sanitizer
+// TODO: MAX global machen
 
 function forms() {
     global $wpdb;
@@ -52,6 +52,7 @@ function forms() {
 
     $app_slot_ids = array();
     $registered_message = "";
+    $file_uploaded = 0;
 
     $MAX_TIMESLOTS = 2;
 
@@ -138,6 +139,8 @@ function forms() {
     // retrieve values from database
     if (isset($_GET["id"])) {
         $uuid = $_GET["id"];
+
+        $file_uploaded = (count(glob(BAPS_UPLOAD_DIR.$uuid."*")) > 0) ? 1 : 0;
 
         if (!$wpdb->get_var("SELECT id FROM {$wp}baps_applicants WHERE uuid = '$uuid'")) {
             echo("Bewerbung nicht gefunden, bitte überprüfe deinen Link oder kontaktiere die Organisatoren des Events.");
@@ -230,6 +233,7 @@ function forms() {
     $html = $html.'<li>';
     $html = $html.'<span>Lebenslauf hochladen</span>';
     $html = $html.'<input type="file" name="cv" id="sel" /><br />';
+    $html = $html."<input type=\"hidden\" id=\"sel\" name=\"file_uploaded\" value=\"$file_uploaded\">";
     $html = $html.'</li>';
     $html = $html.'<li>';
     //echo $html;
