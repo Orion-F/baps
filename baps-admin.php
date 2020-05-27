@@ -31,7 +31,7 @@ function baps_admin_page() {
         foreach ($ts_results as $ts_r) {
             $slot_query = "SELECT name FROM {$wp}baps_companies WHERE id = {$ts_r->company_id} UNION SELECT slot FROM {$wp}baps_timeslots WHERE id = {$ts_r->timeslot_id}";
             $slot_results = $wpdb->get_results($slot_query);
-            $occupied_slots = $occupied_slots.$slot_results[0]->name." <i>".$slot_results[1]->name."</i>";
+            $occupied_slots = $occupied_slots.$slot_results[0]->name." <i>".$slot_results[1]->name."</i><br/>";
         }
         $table = $table."<tr>
                             <td>{$r->uuid}</td>
