@@ -130,7 +130,9 @@ function forms() {
         $registered_message = "<h2>Du hast dich erfolgreich für beWANTED angemeldet!</h2>
         <p>Um Details deiner Anmeldung zu sehen, oder um nachträchlich etwas zu ändern klicke auf diesen Link:
         <a href=$link>$link</a></p><p>Bitte schreibe ihn auf oder speichere diese Seite als Lesezeichen.</p>
-        <p>Wir haben dir ein Bestätigungsmail geschickt. Falls du es bekommen hast, schau bitte in deinem Spam-Ordner nach.";
+        <p>Wir haben dir ein Bestätigungsmail geschickt. Falls du es bekommen hast, schau bitte in deinem Spam-Ordner nach.</p>
+        <p>PS: <a href=\"https://docs.google.com/forms/d/e/1FAIpQLSeKH-b8kw2VQ4E2rkvsWETuomvGtz-foOM8B3unq1voI7caTQ/viewform\">
+        Kannst du uns sagen, wie du auf beWANTED aufmerksam geworden bist?</a> Es würde uns viel helfen und dauert auch nur 10 Sekunden :)</p>";
     }
 
     // retrieve values from database
