@@ -1,4 +1,5 @@
 <?php
+
 function baps_admin_page() {
     global $wpdb;
     $wp = $wpdb->prefix;
@@ -7,7 +8,6 @@ function baps_admin_page() {
         export(); 
     } 
 
-    // table: id, name, email, student_id, study_field, semester, timeslots, waiting_list (??)
     $table = "<table>
                 <tr>
                     <th>ID</th>
@@ -19,6 +19,7 @@ function baps_admin_page() {
                     <th>Applied Timeslots</th>
                 </tr>";
 
+    // TODO: proper display of study field
     $query = "SELECT id, uuid, name, email, student_id, study_field, semester FROM {$wp}baps_applicants";
     $results = $wpdb->get_results($query);
     foreach ($results as $r) {
@@ -50,16 +51,50 @@ function baps_admin_page() {
     echo $html;
 }
 
-function export() {
+function baps_export_page() {
+    global $wpdb;
+    $wp = $wpdb->prefix;
+
+    $html = "<ul>";
+
     $query = "SELECT id, name FROM {$wp}baps_companies WHERE 1";
     $results = $wpdb->get_results($query);
     foreach ($results as $r) {
-        $applicant_query = "SELECT * FROM {$wp}baps_timeslots_applicants WHERE timeslot_id in (SELECT timeslot_id FROM {$wp}baps_timeslots_companies WHERE company_id = $r->id) ORDER BY timestamp";
+        $application_query = "SELECT {$wp}baps_applicants.name, {$wp}baps_study_fields.field, {$wp}baps_applicants.semester, 
+                {$wp}baps_applicants.email, {$wp}baps_applicants.uuid, {$wp}baps_timeslots.slot
+            FROM {$wp}baps_timeslots_applicants
+            LEFT JOIN {$wp}baps_applicants ON {$wp}baps_applicants.id = {$wp}baps_timeslots_applicants.applicant_id
+            LEFT JOIN {$wp}baps_timeslots ON {$wp}baps_timeslots.id = {$wp}baps_timeslots_applicants.timeslot_id
+            LEFT JOIN {$wp}baps_study_fields ON {$wp}baps_study_fields.id = {$wp}baps_applicants.study_field
+            WHERE timeslot_id IN (SELECT timeslot_id FROM {$wp}baps_timeslots_companies WHERE company_id = {$r->id}) AND company_id = {$r->id} ORDER BY timestamp";
+        $application_data = $wpdb->get_results($application_query);
+
+        $csv = fopen("php://memory", "w");
+        $zip_file = new ZipArchive();
+        $zip_fn = BAPS_UPLOAD_DIR."export/".$r->name.".zip";
+        $zip_file->open($zip_fn, ZipArchive::CREATE);
+
+        $cnt = 1;
+        fputcsv($csv, array("Zeit", "Name", "Studienrichtung", "Semester", "E-Mail"));
+        foreach ($application_data as $application) {
+            $ext = pathinfo(glob(BAPS_UPLOAD_DIR.$application->uuid."*")[0], PATHINFO_EXTENSION);
+            $cv_file = BAPS_UPLOAD_DIR.$application->uuid.".".$ext;
+
+            $line = array($application->slot, $application->name, $application->field, $application->semester, $application->email);
+            fputcsv($csv, $line);
+
+            $zip_file->addFile($cv_file, str_pad($cnt, 2,"0", STR_PAD_LEFT)."_".str_replace(" ", "", $application->name).".".$ext);
+            $cnt++;
+        }
+        rewind($csv);
+        $zip_file->addFromString("00_Applications.csv", stream_get_contents($csv));
+
+        $zip_fn = home_url()."/wp-content/plugins/baps/uploads/export/".basename($zip_fn);
+        $html = $html."<li><a href=\"{$zip_fn}\">{$r->name}</a></li>";
     }
-
-    // for id in query:
-    //      
-
+    $html = "<h1>Download CVs</h1><p>Download a Zip file with all CVs and a list of applicants.</p>
+            <p>Applicants are ordered by their application time.</p>".$html."</ul>";
+    echo $html;
 
 }
 

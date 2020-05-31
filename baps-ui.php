@@ -42,7 +42,7 @@ function baps_application_page() {
 }
 
 // TODO: Matrikelnummer eindeutig machen (Problem beim updaten)
-// TODO: Warteliste verbessern
+// TODO: Warteliste verbessern (auch für Export)
 // TODO: persönliches Email
 
 function forms() {

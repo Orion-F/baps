@@ -16,6 +16,7 @@ add_action('init', 'baps_init');
 
 function baps_menu() {
     add_menu_page("BEST Application System", "BEST Application System", "publish_posts", "baps-admin", "baps_admin_page");
+    add_submenu_page("baps-admin", "Export CVs", "Export CVs", "activate_plugins", "baps_export", "baps_export_page");
     add_submenu_page("baps-admin", "Settings", "Settings", "activate_plugins", "baps_settings", "baps_settings_page");
 // add_submenu_page("applications", "Settings", "Settings", "activate_plugins", "applications_settings", "aps_settings_page");
 // add_submenu_page( string $parent_slug, string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', int $position = null )
