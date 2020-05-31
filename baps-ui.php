@@ -61,9 +61,9 @@ function forms() {
     $response_companies = $wpdb->get_results($query_companies);
     $companies = array_combine(array_column($response_companies, "id"), array_column($response_companies, "name"));
 
-    $query_study_fields = "SELECT id, name FROM {$wp}baps_study_fields";
+    $query_study_fields = "SELECT id, field FROM {$wp}baps_study_fields";
     $response_study_fields = $wpdb->get_results($query_study_fields);
-    $study_fields = array_combine(array_column($response_study_fields, "id"), array_column($response_study_fields, "name"));
+    $study_fields = array_combine(array_column($response_study_fields, "id"), array_column($response_study_fields, "field"));
     $study_fields_flipped = array_flip($study_fields);
 
     // add / update application
@@ -205,13 +205,13 @@ function forms() {
     $html = $html.'<label for="study_field">Studienrichtung</label>';
     $html = $html.sprintf('<select name="study_field" value="%s">', $study_field);
 
-    $query = "SELECT name FROM {$wp}baps_study_fields ORDER BY {$wp}baps_study_fields.id ASC";
+    $query = "SELECT field FROM {$wp}baps_study_fields ORDER BY {$wp}baps_study_fields.id ASC";
     $response = $wpdb->get_results($query);
     foreach ($response as $r) {
-        if ($r->name == $study_field)
-            $html = $html.sprintf('<option selected>%s</option>', $r->name);
+        if ($r->field == $study_field)
+            $html = $html.sprintf('<option selected>%s</option>', $r->field);
         else
-            $html = $html.sprintf('<option>%s</option>', $r->name);
+            $html = $html.sprintf('<option>%s</option>', $r->field);
 
     }
     $html = $html.'</select>';

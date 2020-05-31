@@ -90,7 +90,7 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
 
   $query = "CREATE TABLE IF NOT EXISTS `{$wp}baps_study_fields` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(255),
+    `field` varchar(255),
     UNIQUE (id),
     PRIMARY KEY (`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;";
@@ -125,7 +125,7 @@ INSERT INTO `wp_baps_timeslots` (`id`, `slot`) VALUES
     echo($query);
     $wpdb->query($query);
 
-    $query = "INSERT INTO {$wp}baps_study_fields (id, name) VALUES 
+    $query = "INSERT INTO {$wp}baps_study_fields (id, field) VALUES 
       (NULL, 'Architektur'), 
       (NULL, 'Bauingenieurwesen'), 
       (NULL, 'Biomedical Engineering'), 
