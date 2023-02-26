@@ -23,6 +23,8 @@ Timeslots zu Firmen zuordnen
 
 */
 
+// TODO: add field for phone number
+
 function register_baps_resources() {
     wp_register_style('baps-style', plugins_url('/baps/baps-style.css'));
     wp_enqueue_style('baps-style');
@@ -57,7 +59,7 @@ function forms() {
     $response_timeslots = $wpdb->get_results($query_timeslots);
     $timeslots = array_combine(array_column($response_timeslots, "id"), array_column($response_timeslots, 'slot'));
 
-    $query_companies = "SELECT id, name FROM {$wp}baps_companies";
+    $query_companies = "SELECT id, name FROM {$wp}baps_companies WHERE id != 93 AND id != 97 AND id != 99 AND id != 101";
     $response_companies = $wpdb->get_results($query_companies);
     $companies = array_combine(array_column($response_companies, "id"), array_column($response_companies, "name"));
 
@@ -71,6 +73,7 @@ function forms() {
     if (!empty($_POST)) {
         $full_name = $_POST["full_name"];
         $email = $_POST["email"];
+        $phone = $_POST["phone"];
         $student_id = $_POST["student_id"];
         $study_field = $_POST["study_field"];
         $semester = $_POST["semester"];
@@ -93,9 +96,9 @@ function forms() {
         // probably not the most elegant way, to deactivate the foreign key checks
         $query = "SET foreign_key_checks = 0";
         $wpdb->query($query);
-        $query = "REPLACE INTO {$wp}baps_applicants (id, name, email, student_id, uuid, study_field, semester) 
-            VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s')";
-        $wpdb->query($wpdb->prepare($query, $app_id, $full_name, $email, $student_id, $uuid, $study_fields_flipped[$study_field], $semester));
+        $query = "REPLACE INTO {$wp}baps_applicants (id, name, email, phone, student_id, uuid, study_field, semester) 
+            VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+        $wpdb->query($wpdb->prepare($query, $app_id, $full_name, $email, $phone, $student_id, $uuid, $study_fields_flipped[$study_field], $semester));
         $query = "SET foreign_key_checks = 1";
         $wpdb->query($query); 
 
@@ -130,8 +133,8 @@ function forms() {
         $registered_message = "<h2>Du hast dich erfolgreich für beWANTED angemeldet!</h2>
         <p>Um Details deiner Anmeldung zu sehen, oder um nachträchlich etwas zu ändern klicke auf diesen Link:
         <a href=$link>$link</a></p><p>Bitte schreibe ihn auf oder speichere diese Seite als Lesezeichen.</p>
-        <p>Wir haben dir ein Bestätigungsmail geschickt. Falls du es bekommen hast, schau bitte in deinem Spam-Ordner nach.</p>
-        <p>PS: <a href=\"https://docs.google.com/forms/d/e/1FAIpQLSeKH-b8kw2VQ4E2rkvsWETuomvGtz-foOM8B3unq1voI7caTQ/viewform\">
+        <p>Wir haben dir ein Bestätigungsmail geschickt. Falls du es nicht bekommen hast, schau bitte in deinem Spam- oder Promotions-Ordner nach.</p>
+        <p>PS: <a href=\"https://forms.gle/oroTqTiw89txgsZy6\">
         Kannst du uns sagen, wie du auf beWANTED aufmerksam geworden bist?</a> Es würde uns viel helfen und dauert auch nur 10 Sekunden :)</p>";
     }
 
@@ -148,6 +151,7 @@ function forms() {
 
             $full_name = "";
             $email = "";
+            $phone = "";
             $student_id = "";
             $study_field = "";
             $semester = "";
@@ -158,6 +162,7 @@ function forms() {
 
             $full_name = $filled->name;
             $email = $filled->email;
+            $phone = $filled->phone;
             $student_id = $filled->student_id;
             $study_field = $study_fields[$filled->study_field];
             $semester = $filled->semester;
@@ -178,6 +183,7 @@ function forms() {
 
         $full_name = "";
         $email = "";
+        $phone = "";
         $student_id = "";
         $study_field = "";
         $semester = "";
@@ -189,12 +195,17 @@ function forms() {
     $html = $html.'<li>';
     $html = $html.'<label for="name">Name</label>';
     $html = $html.sprintf('<input type="text" name="full_name" value="%s" maxlength="100">', $full_name);
-    $html = $html.'<span>Dein Name</span>';
+    $html = $html.'<span>Dein Vor- und Nachname</span>';
     $html = $html.'</li>';
     $html = $html.'<li>';
     $html = $html.'<label for="email">E-mail</label>';
     $html = $html.sprintf('<input type="email" name="email" value="%s" maxlength="100">', $email);
     $html = $html.'<span>Deine E-Mail Adresse</span>';
+    $html = $html.'</li>';
+    $html = $html.'<li>';
+    $html = $html.'<label for="phone">Telefonnummer</label>';
+    $html = $html.sprintf('<input type="text" name="phone" value="%s" maxlength="100">', $phone);
+    $html = $html.'<span>Deine Telefonnummer (für eventuelle Rückfragen)</span>';
     $html = $html.'</li>';
     $html = $html.'<li>';
     $html = $html.'<label for="student_id">Matrikelnummer</label>';
@@ -261,7 +272,7 @@ function forms() {
     $query_occupations = "SELECT applicant_id, company_id, timeslot_id FROM {$wp}baps_timeslots_applicants";
     $response_occupations = $wpdb->get_results($query_occupations);
 
-    $query_company_timeslots = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_companies";
+    $query_company_timeslots = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_companies WHERE company_id != 93 AND company_id != 97 AND company_id != 99 AND company_id != 101";
     $response_company_timeslots = $wpdb->get_results($query_company_timeslots);
 
     $selectors = '';
@@ -294,9 +305,12 @@ function forms() {
         else
             $selected = '';
 
-        $selectors = $selectors."<option value=\"{$app_id}\" {$selected}>{$timeslots[$r_t->timeslot_id]} ({$free_slots})</option>";
+        $selectors = $selectors."<option value=\"{$app_id}\" {$selected}>{$timeslots[$r_t->timeslot_id]} ($num_applications_timeslot/2)</option>";
     }
     $selectors = $selectors."</select>";
+    $html = $html.'<span style="color: #dea514; margin-bottom: 5px;">Bitte beachte, dass nur 2 Kandidaten per Slot ausgewählt werden. Wir kontaktieren Dich nach der Auswahl! </span>';
+	// $html = $html.'<span style="color: #2B7880; margin-bottom: 5px;">Slots für A1, Siemens Mobility, PwC und NETCONOMY sind schon ausgebucht! </span>';
+
 
     /*
     $ts_query = "SELECT id, slot from {$wp}baps_timeslots";
@@ -353,7 +367,7 @@ function forms() {
  
     $html = $html.$selectors."</li>";
 
-    $html = $html.'<li>';
+    $html = $html.'<li style="border: none; margin-left: 30%;">';
     $html = $html.'<input type="submit" value="Absenden" name="submit" />';
     $html = $html.'<li>';
     $html = $html.'</ul>';
@@ -416,7 +430,7 @@ function upload_file($filename) {
 
 function send_mail($recipient, $uuid) {
     $header = array(
-        "From: vienna@best.eu.org",
+        "From: orion.forowycz@best-eu.org",
         "MIME-Version: 1.0",
         "Content-Type: text/html;charset=utf-8"
     );
@@ -426,6 +440,8 @@ function send_mail($recipient, $uuid) {
     $msg = "<html><body><h2>Du hast dich erfolgreich für beWANTED angemeldet!</h2>
         <p>Um Details deiner Anmeldung zu sehen, oder um nachträglich etwas zu ändern klicke auf diesen Link:
         <a href=$link>$link</a></p>
+		<p>PS: <a href=\"https://forms.gle/oroTqTiw89txgsZy6\">
+        Kannst du uns sagen, wie du auf beWANTED aufmerksam geworden bist?</a> Es würde uns viel helfen und dauert auch nur 10 Sekunden :)</p>
         <p>Mit freundlichen Grüßen,<br/>BEST Vienna</p></body></html>";
 
     $ret = mail(
@@ -435,5 +451,3 @@ function send_mail($recipient, $uuid) {
         implode("\r\n", $header)
     );
 }
-
-?>
