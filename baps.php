@@ -44,6 +44,7 @@ function baps_activation()
 global $wpdb;
 $wp = $wpdb->prefix;
 
+global $bool_initialize_db;
 if ($bool_initialize_db) {
 
   //   $sql = "INSERT INTO `wp_baps_companies` (`id`, `name`) VALUES 
