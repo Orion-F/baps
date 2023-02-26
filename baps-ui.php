@@ -308,7 +308,7 @@ function forms() {
         $selectors = $selectors."<option value=\"{$app_id}\" {$selected}>{$timeslots[$r_t->timeslot_id]} ($num_applications_timeslot/2)</option>";
     }
     $selectors = $selectors."</select>";
-    $html = $html.'<span style="color: #dea514; margin-bottom: 5px;">Bitte beachte, dass nur 2 Kandidaten per Slot ausgewählt werden. Wir kontaktieren Dich nach der Auswahl! </span>';
+    $html = $html.'<span style="color: #dea514; margin-bottom: 5px;">Bitte beachte, dass nur 2 Kandidat*innen per Slot ausgewählt werden. Wir kontaktieren Dich nach der Auswahl! </span>';
 	// $html = $html.'<span style="color: #2B7880; margin-bottom: 5px;">Slots für A1, Siemens Mobility, PwC und NETCONOMY sind schon ausgebucht! </span>';
 
 
