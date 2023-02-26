@@ -34,16 +34,16 @@ function baps_admin_page() {
     $results = $wpdb->get_results($query);
     foreach ($results as $r) {
         $applicant_id = $r->id;
-        $ts_query = "SELECT company_id, timeslot_id FROM {$wp}baps_timeslots_companies WHERE 
-            timeslot_id IN (SELECT timeslot_id FROM {$wp}baps_timeslots_applicants WHERE applicant_id = {$applicant_id})";
+        # For a given applicant, the query below gives a table of company_ids, and appropriate slot for each one.
+        $ts_query = "SELECT DISTINCT wien_baps_timeslots_applicants.company_id, wien_baps_timeslots.slot FROM wien_baps_timeslots_applicants JOIN wien_baps_timeslots_companies ON wien_baps_timeslots_applicants.company_id = wien_baps_timeslots_companies.company_id JOIN wien_baps_timeslots ON wien_baps_timeslots_applicants.timeslot_id = wien_baps_timeslots.id WHERE wien_baps_timeslots_applicants.applicant_id = {$applicant_id}";
         $ts_results = $wpdb->get_results($ts_query);
 
 // TODO: UNION ist nicht gut!        
         $occupied_slots = "";
         foreach ($ts_results as $ts_r) {
-            $slot_query = "SELECT name FROM {$wp}baps_companies WHERE id = {$ts_r->company_id} UNION SELECT slot FROM {$wp}baps_timeslots WHERE id = {$ts_r->timeslot_id}";
-            $slot_results = $wpdb->get_results($slot_query);
-            $occupied_slots = $occupied_slots.$slot_results[0]->name." <i>".$slot_results[1]->name."</i><br/>";
+            $company_name_query = "SELECT name FROM {$wp}baps_companies WHERE id = {$ts_r->company_id}";
+            $company_name = $wpdb->get_results($company_name_query);
+            $occupied_slots = $occupied_slots.$company_name[0]->name." <i>".$ts_r->slot."</i><br/>";
         }
         $table = $table."<tr>
                             <td>{$r->uuid}</td>
